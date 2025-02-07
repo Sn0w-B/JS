@@ -20,9 +20,18 @@ function nombreAleatoire(max) {
 }
 
 // Retire les mots en double
-function trier(liste) {
-	return [...new Set(liste)];
-}
+function trier(liste){ //Pour chaque élément, on parcours toute la liste jusqu'à tomber sur un mot identique. Si tous les mots sont différents, il est ajouté à la liste des indices valides.
+        let liste_indices_valides = [];
+        boucle1: for (let i=0; i<liste.length; i++){ 
+            for (let j=0; j<liste.length; j++){
+                if (liste[i]==liste[j] && i!=j) { //On vérifie si 2 indices donnés par 2 joueurs différents sont identiques
+                    continue boucle1 // si oui, alors on passe à l'itération suivante dans boucle1, c'est-à-dire l'élément suivant dans la liste des indices
+                }
+            }
+            liste_indices_valides.push(liste[i])
+        }
+        return(liste_indices_valides)
+    }
 
 // Demande le nombre de joueurs
 async function getPlayerCount() {
@@ -85,21 +94,27 @@ async function playRound(playerCount, activePlayer, secretWord) {
 	const validClues = trier(clues);
 	
 	// Phase de devinette
-	const guess = await getPlayerGuess(activePlayer, validClues);
+	if (validClues.length == 0) {
+		console.log(chalk.red(`\n:( Dommage... Tous les indices sont identiques, Le mot était : ${secretWord}`));
+		return false
+	}
 	
 	// Vérification de la réponse
-	if (guess.toLowerCase() === secretWord.toLowerCase()) {
-		console.log(chalk.green('\n;) Bravo! C\'est le bon mot!'));
-		return true;
-	} else {
-		console.log(chalk.red(`\n:( Dommage... Le mot était : ${secretWord}`));
-		return false;
+	else {
+		const guess = await getPlayerGuess(activePlayer, validClues);
+		if (guess.toLowerCase() === secretWord.toLowerCase()) {
+			console.log(chalk.green('\n;) Bravo! C\'est le bon mot!'));
+			return true;
+		} else {
+			console.log(chalk.red(`\n:( Dommage... Le mot était : ${secretWord}`));
+			return false;
+		}
 	}
 }
 
 // Sélection d'un mot au hasard
-async function selectWord() {
-	const carteNumber = nombreAleatoire(liste_mots.length / 5 - 1);
+async function selectWord(round) {
+	const carteNumber = round;
 	const { wordNumber } = await inquirer.prompt([{
 		type: 'number',
 		name: 'wordNumber',
@@ -125,7 +140,7 @@ async function main() {
 		console.log(chalk.blue(`\n=== Manche ${round + 1}/13 ===`));
 		
 		// Sélection du mot
-		const secretWord = await selectWord();
+		const secretWord = await selectWord(round);
 		
 		// Jouer le tour
 		const activePlayer = (round % playerCount) + 1;
