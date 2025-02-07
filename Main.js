@@ -2,29 +2,26 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 
 const liste_mots = [
-	"Boîte", "Chapeau", "Danse", "Arbre", "Fenêtre", "Ordinateur", "Lampe", "Porte", "Table", "Chaise",
-	"Voiture", "Avion", "Bateau", "Téléphone", "Montre", "Clavier", "Souris", "Écran", "Livre", "Stylo",
-	"Crayon", "Cahier", "Sac", "Veste", "Miroir", "Parapluie", "Rideau", "Canapé", "Fauteuil", "Horloge",
-	"Lunettes", "Télévision", "Radio", "Musique", "Guitare", "Piano", "Violoncelle", "Trompette", "Batterie", "Flûte",
-	"Chien", "Chat", "Lapin", "Oiseau", "Poisson", "Tigre", "Lion", "Éléphant", "Girafe", "Singe",
-	"Pomme", "Banane", "Orange", "Fraise", "Raisin", "Mangue", "Ananas", "Pastèque", "Citron", "Cerise",
-	"Lait", "Eau", "Café", "Thé", "Jus", "Chocolat", "Pizza", "Pâtes", "Riz", "Pain",
-	"Montagne", "Forêt", "Rivière", "Plage", "Désert", "Lac", "Île", "Ciel", "Nuage", "Arc-en-ciel",
-	"École", "Université", "Livre", "Cahier", "Tableau", "Craie", "Stylo", "Gomme", "Cartable", "Règle",
-	"Train", "Bus", "Vélo", "Moto", "Tramway", "Métro", "Trottinette", "Bateau", "Fusée", "Hélicoptère"
-];
+        "Buffle", "Volcan", "Passion", "Coq", "Electricité", "César", "Nouille", "Chapeau", "Dentiste", "Blé",
+        "Guillotine", "Magicien", "Hockey", "Banane", "Piaf", "Tatouage", "Spielberg", "Pomme", "Sirène", "Boxe",
+        "Nain", "Cirque", "Elvis", "Tondeuse", "Pierre", "Chevalier", "Paix", "Fleur", "Suisse", "Calendrier",
+        "Train", "Sardine", "Pièce", "Cléopâtre", "Fenêtre", "Tableau", "Pompier", "Verre", "Couscous", "Grèce",
+        "Coccinelle", "Moutarde", "Sherlock", "Bouteille", "Virus", "Tokyo", "Talon", "Poulet", "Hélicoptère", "Colonel",
+        "Vis", "Râteau", "Ordinateur", "Nespresso", "Bal", "Canne", "Mousquetaire", "Fil", "Tulipe", "Ikea",
+        "Barbie", "Chocolat", "Neige", "Cravate", "Vent"];
 
 // Génération d'un nombre aléatoire entre 0 et max
-function nombreAleatoire(max) {
-	return Math.floor(Math.random() * (max + 1));
-}
+
 
 // Retire les mots en double
-function trier(liste){ //Pour chaque élément, on parcours toute la liste jusqu'à tomber sur un mot identique. Si tous les mots sont différents, il est ajouté à la liste des indices valides.
+function trier(liste, mot_actif){ //Pour chaque élément, on parcours toute la liste jusqu'à tomber sur un mot identique. Si tous les mots sont différents, il est ajouté à la liste des indices valides.
         let liste_indices_valides = [];
         boucle1: for (let i=0; i<liste.length; i++){ 
+            if  (liste[i]==mot_actif){
+            continue boucle1
+            }
             for (let j=0; j<liste.length; j++){
-                if (liste[i]==liste[j] && i!=j) { //On vérifie si 2 indices donnés par 2 joueurs différents sont identiques
+                if (liste[i]==liste[j] && i!=j){ //On vérifie si 2 indices donnés par 2 joueurs différents sont identiques
                     continue boucle1 // si oui, alors on passe à l'itération suivante dans boucle1, c'est-à-dire l'élément suivant dans la liste des indices
                 }
             }
@@ -49,11 +46,12 @@ async function getPlayerCount() {
 }
 
 // Demande un indice à un joueur
-async function getPlayerClue(playerNumber, activePlayer) {
+async function getPlayerClue(playerNumber, activePlayer, secretWord) {
+	console.clear()
 	const { clue } = await inquirer.prompt([{
 		type: 'input',
 		name: 'clue',
-		message: chalk.yellow(`Joueur ${playerNumber}, donnez votre indice (le joueur ${activePlayer} ne doit pas voir)`),
+		message: chalk.yellow(`Le mot secret est ${secretWord}.\nJoueur ${playerNumber}, donnez votre indice (le joueur ${activePlayer} ne doit pas voir)`),
 		validate: input => input.length > 0 ? true : 'Veuillez entrer un mot!'
 	}]);
 	return clue;
@@ -81,8 +79,7 @@ async function playRound(playerCount, activePlayer, secretWord) {
 	for (let i = 1; i <= playerCount; i++) {
 		if (i !== activePlayer) {
 			// Affiche le mot secret aux autres joueurs
-			console.log(chalk.red(`\nLe mot à faire deviner est : ${secretWord}`));
-			const clue = await getPlayerClue(i, activePlayer);
+			const clue = await getPlayerClue(i, activePlayer, secretWord);
 			clues.push(clue);
 		}
 	}
@@ -91,11 +88,11 @@ async function playRound(playerCount, activePlayer, secretWord) {
 	console.clear();
 	
 	// Filtrage des indices en double
-	const validClues = trier(clues);
+	const validClues = trier(clues, secretWord);
 	
 	// Phase de devinette
 	if (validClues.length == 0) {
-		console.log(chalk.red(`\n:( Dommage... Tous les indices sont identiques, Le mot était : ${secretWord}`));
+		console.log(chalk.cyan(`\n:( Dommage... Tous les indices sont identiques, Le mot était : ${secretWord}`));
 		return false
 	}
 	
@@ -106,7 +103,7 @@ async function playRound(playerCount, activePlayer, secretWord) {
 			console.log(chalk.green('\n;) Bravo! C\'est le bon mot!'));
 			return true;
 		} else {
-			console.log(chalk.red(`\n:( Dommage... Le mot était : ${secretWord}`));
+			console.log(chalk.cyan(`\n:( Dommage... Le mot était : ${secretWord}`));
 			return false;
 		}
 	}
@@ -177,8 +174,17 @@ async function main() {
 	else if (score >= 0) {
 		console.log(chalk.yellow.bold('Essayez encore (loosers) !'));
 	}
+	
+	const { rejouer } = await inquirer.prompt([{
+		type: 'confirm',
+		name: 'rejouer',
+		message: chalk.yellow(`Voulez vous rejouer ?`),
+	}]);
+	if (rejouer) {
+		await main()
+	}
 }
 
 main().catch(err => {
-	console.error(chalk.red('Une erreur est survenue:'), err);
+	console.error(chalk.cyan('Une erreur est survenue:'), err);
 });
