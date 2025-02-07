@@ -115,7 +115,7 @@ async function selectWord(round) {
 	const { wordNumber } = await inquirer.prompt([{
 		type: 'number',
 		name: 'wordNumber',
-		message: chalk.blue('Choisissez un numéro entre 1 et 5'),
+		message: chalk.blue('Choisissez un numéro entre 1 et 5, puis tournez vous !'),
 		validate: input => {
 			if (input < 1 || input > 5) return 'Le numéro doit être entre 1 et 5';
 			return true;
@@ -138,6 +138,7 @@ async function main() {
 		
 		// Sélection du mot
 		const secretWord = await selectWord(round);
+		
 		
 		// Jouer le tour
 		const activePlayer = (round % playerCount) + 1;
