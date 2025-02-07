@@ -1,0 +1,28 @@
+{
+  "name": "just-one",
+  "version": "1.0.0",
+  "description": "Jeu de cartes et devinettes projet JS",
+  "main": "Main.js",
+  "type": "module",
+  "scripts": {
+    "start": "node Main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sn0w-B/JS.git"
+  },
+  "keywords": [
+    "just-one"
+  ],
+  "author": "Greg et Louis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sn0w-B/JS/issues"
+  },
+  "homepage": "https://github.com/Sn0w-B/JS#readme",
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "inquirer": "^12.4.1"
+  }
+}
